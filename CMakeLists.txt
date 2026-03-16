@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.22)
 
 set(CXX_DISABLE_WERROR 1)
 set(CMAKE_CXX_STANDARD 11)
@@ -15,7 +15,7 @@ if(NOT TARGET mc_rtc::mc_control)
   # find_package(Stabiliplus REQUIRED)
   find_package(sch-core REQUIRED)
   find_package(mc_dynamic_polytopes REQUIRED)
-  find_package(DCM_VRPTask REQUIRED)
+  find_package(DCM_VRPTask CONFIG REQUIRED)
   # find_package(eigen-cdd REQUIRED)
 endif()
 
