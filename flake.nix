@@ -45,6 +45,20 @@
                 src = lib.cleanSource ./.;
               };
 
+              overrideAttrs.mc-force-shoe-plugin = {
+                src = lib.cleanSource /home/arnaud/devel/mc-rtc-nix/workspace/mc_force_shoe_plugin;
+              };
+              overrideAttrs.mc-state-observation =
+                { pkgs-final, ... }:
+                {
+                  src = pkgs-final.fetchgit {
+                    url = "https://github.com/arntanguy/mc_state_observation.git";
+                    rev = "1a56ad133d26cb0fa80c4359380fb5934ad7ce6e";
+                    hash = "sha256-sIY0mwNQkPDnqD7KssQ0OD851rQI3Q8kiPxVGB4+WAA=";
+                    fetchSubmodules = true;
+                  };
+                };
+
               overrideAttrs.dcm-vrptask =
                 { pkgs-final, ... }:
                 {
@@ -93,6 +107,15 @@
                 src = lib.cleanSource ./.;
               };
 
+              overrides.mc-mujoco-robots =
+                { pkgs-final, ... }:
+                {
+                  robots = with pkgs-final; [
+                    hrp4-mj-description
+                    rhps1-mj-description
+                  ];
+                };
+
               # overrides override package function arguments, while overrideAttrs overrides the attribute set
               overrides.mc-rtc-superbuild =
                 { pkgs-final, pkgs-prev, ... }:
@@ -106,6 +129,7 @@
                     controllers = [ pkgs-final.polytopeController ];
                     configs = [ "${pkgs-final.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml" ];
                     plugins = [ pkgs-final.mc-force-shoe-plugin ];
+                    observers = [ pkgs-final.mc-state-observation ];
                   };
                 };
 
@@ -115,10 +139,23 @@
         perSystem =
           { pkgs, ... }:
           {
-            devShells.polytopeController-superbuild = pkgs.callPackage "${inputs.mc-rtc-nix}/shell.nix" {
-              inherit pkgs;
-              mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
-            };
+            devShells.polytopeController-superbuild =
+              (pkgs.callPackage "${inputs.mc-rtc-nix}/shell.nix" {
+                inherit pkgs;
+                mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
+                #
+                # POLYTOPECONTROLLER = "${pkgs.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml:${pkgs.mc-rtc-superbuild}/etc/mc_rtc.yaml";
+                # POLYTOPECONTROLLER_MUJOCO = "${pkgs.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml:${pkgs.mc-rtc-superbuild}/etc/mc_rtc.yaml";
+              }).overrideAttrs
+                (old: {
+                  shellHook = ''
+                    ${old.shellHook or ""}
+
+                    # Your custom shellHook commands
+                    export POLYTOPE_CONTROLLER="${pkgs.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml"
+                    export POLYTOPE_CONTROLLER_MUJOCO="${pkgs.polytopeController}/lib/mc_controller/etc/mc_rtc_MuJoCo.yaml"
+                  '';
+                });
           };
       }
     );

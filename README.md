@@ -48,3 +48,20 @@ This provides a shell with:
 - All runtime dependencies needed by mc-rtc and the project installed
 - A default `mc_rtc.yaml` configuration for the project
 - `mc_mujoco`, `mc-rtc-magnum`, `mc-rtc-rviz` and other relevant gui tools
+
+Within this shell, run
+
+```sh
+# run gui in the background (you can also run it in another shell)
+mc-rtc-magnum &
+# or mc-rtc-rviz &
+# run ticker with the default configuration of the controller generated from etc/mc_rtc.in.yaml
+mc_rtc_ticker
+```
+
+or for mujoco
+
+```sh
+# POLYTOPE_CONTROLLER_MUJOCO is an environment variable pointing to a configuration using the _MuJoCo variant of the robot module
+mc_mujoco -f $POLYTOPE_CONTROLLER_MUJOCO
+```
