@@ -19,18 +19,7 @@
           inputs.mc-rtc-nix.flakeModulePrivate
           {
             flakoboros = {
-              extraPackages = [
-                "ninja"
-                # FIXME: why are these needed here?
-                "pkg-config"
-                "rosidl-default-generators"
-                # "geometry-msgs"
-                "rosidl-default-runtime"
-                "rosidl-typesupport-c"
-                "rosidl-typesupport-cpp"
-                "ament-cmake"
-                "mc-rtc-magnum"
-              ];
+              extraPackages = [ "ninja" ];
               extraDevPackages = [ "pkg-config" ];
               overrideAttrs.mc-panda = {
                 src = lib.cleanSource /home/arnaud/devel/mc-rtc-nix/workspace/mc_panda;
