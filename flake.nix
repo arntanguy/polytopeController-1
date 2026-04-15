@@ -7,6 +7,28 @@
     # mc-rtc-nix.url = "github:arntanguy/nixpkgs-1?ref=topic/flakoboros";
     flake-parts.follows = "mc-rtc-nix/flake-parts";
     systems.follows = "mc-rtc-nix/systems";
+
+    # or use pull/N/merge to get the version merged with master, assuming there are no conflicts
+    mc-force-shoe-plugin.url = "github:Hugo-L3174/mc_force_shoe_plugin/pull/16/head";
+    mc-force-shoe-plugin.flake = false;
+
+    mc-state-observation.url = "github:arntanguy/mc_state_observation/topic/DynamicConstraint";
+    mc-state-observation.flake = false;
+
+    dcm-vrptask.url = "github:Hugo-L3174/DCM_VRPTask/pull/1/head";
+    dcm-vrptask.flake = false;
+
+    mc-dynamic-polytopes.url = "github:Hugo-L3174/mc_dynamic_polytopes/pull/6/head";
+    mc-dynamic-polytopes.flake = false;
+
+    # FIXME: can't do that yet because of cmake submodule
+
+    # tvm.url = "github:jrl-umi3218/tvm/pull/53/head";
+    # tvm.flake = false;
+
+    # mc-rtc.url = "github:jrl-umi3218/mc_rtc/pull/507/head";
+    # # remove flake=false when https://github.com/jrl-umi3218/mc_rtc/pull/519 is merged
+    # mc-rtc.flake = false;
   };
 
   outputs =
@@ -20,20 +42,20 @@
           {
             flakoboros = {
               extraPackages = [ "ninja" ];
-              extraDevPackages = [ "pkg-config" ];
-              overrideAttrs.mc-force-shoe-plugin =
-                { pkgs-final, ... }:
-                {
-                  # src = lib.cleanSource /home/arnaud/devel/mc-rtc-nix/workspace/mc_force_shoe_plugin;
 
-                  # https://github.com/Hugo-L3174/mc_force_shoe_plugin/pull/16
-                  src = pkgs-final.fetchFromGitHub {
-                    owner = "arntanguy";
-                    repo = "mc_force_shoe_plugin";
-                    rev = "d3c6a5b9f84c67fd25f8c6ccc0396d5a9572d579";
-                    hash = "sha256-mFwizoWXQFV6uKIG7AcbPd40Mio4vvsrQGtngtaiSTY=";
-                  };
-                };
+              overrideAttrs.polytopeController = {
+                src = lib.cleanSource ./.;
+              };
+
+              # Override all dependencies
+              # They are locked in flake.lock to the latest commit available at the time
+              # To update to all inputs' latest commit, use
+              # nix flake update
+              overrideAttrs.mc-force-shoe-plugin = {
+                # src = lib.cleanSource /home/arnaud/devel/mc-rtc-nix/workspace/mc_force_shoe_plugin;
+                src = inputs.mc-force-shoe-plugin;
+              };
+
               overrideAttrs.mc-state-observation =
                 { pkgs-final, ... }:
                 {
@@ -45,27 +67,13 @@
                   };
                 };
 
-              overrideAttrs.dcm-vrptask =
-                { pkgs-final, ... }:
-                {
-                  src = pkgs-final.fetchFromGitHub {
-                    owner = "arntanguy";
-                    repo = "DCM_VRPTask";
-                    rev = "5ceb14fbfebb82b704b4c8629b9a4d0e300f3153";
-                    hash = "sha256-eIwSAAjkPj+SjQOQ0okSCD+QmwL0DL8IGOZsrH1AK4Y=";
-                  };
-                };
+              overrideAttrs.dcm-vrptask = {
+                src = inputs.dcm-vrptask;
+              };
 
-              overrideAttrs.mc-dynamic-polytopes =
-                { pkgs-final, ... }:
-                {
-                  src = pkgs-final.fetchgit {
-                    url = "https://github.com/arntanguy/mc_dynamic_polytopes.git";
-                    # PR#6
-                    rev = "d4d27c78dbedf03c82234c4b579d511072e62c73"; # or a commit hash or branch name
-                    hash = "sha256-qhoD7qYgsjxcfKYo+tzu7X123tZwEJ0qy9cXP9b8UTQ=";
-                  };
-                };
+              overrideAttrs.mc-dynamic-polytopes = {
+                src = inputs.mc-dynamic-polytopes;
+              };
 
               overrideAttrs.tvm =
                 { pkgs-final, ... }:
@@ -88,10 +96,6 @@
                     sha256 = "sha256-DRyjyBjr+CBkQjFt9y9DdtV7UBLzr3ImIjsk7e0uiM8=";
                   };
                 };
-
-              overrideAttrs.polytopeController = {
-                src = lib.cleanSource ./.;
-              };
 
               overrides.mc-mujoco-robots =
                 { pkgs-final, ... }:
@@ -127,11 +131,7 @@
           {
             devShells.polytopeController-superbuild =
               (pkgs.callPackage "${inputs.mc-rtc-nix}/shell.nix" {
-                inherit pkgs;
-                mc-rtc-superbuild = pkgs.mc-rtc-superbuild;
-                #
-                # POLYTOPECONTROLLER = "${pkgs.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml:${pkgs.mc-rtc-superbuild}/etc/mc_rtc.yaml";
-                # POLYTOPECONTROLLER_MUJOCO = "${pkgs.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml:${pkgs.mc-rtc-superbuild}/etc/mc_rtc.yaml";
+                inherit (pkgs) mc-rtc-superbuild;
               }).overrideAttrs
                 (old: {
                   shellHook = ''

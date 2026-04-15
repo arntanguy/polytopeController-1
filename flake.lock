@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "dcm-vrptask": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773699825,
+        "narHash": "sha256-eIwSAAjkPj+SjQOQ0okSCD+QmwL0DL8IGOZsrH1AK4Y=",
+        "owner": "Hugo-L3174",
+        "repo": "DCM_VRPTask",
+        "rev": "5ceb14fbfebb82b704b4c8629b9a4d0e300f3153",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Hugo-L3174",
+        "ref": "pull/1/head",
+        "repo": "DCM_VRPTask",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -312,6 +329,40 @@
         "type": "github"
       }
     },
+    "mc-dynamic-polytopes": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776253164,
+        "narHash": "sha256-qhoD7qYgsjxcfKYo+tzu7X123tZwEJ0qy9cXP9b8UTQ=",
+        "owner": "Hugo-L3174",
+        "repo": "mc_dynamic_polytopes",
+        "rev": "d4d27c78dbedf03c82234c4b579d511072e62c73",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Hugo-L3174",
+        "ref": "pull/6/head",
+        "repo": "mc_dynamic_polytopes",
+        "type": "github"
+      }
+    },
+    "mc-force-shoe-plugin": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776265200,
+        "narHash": "sha256-mFwizoWXQFV6uKIG7AcbPd40Mio4vvsrQGtngtaiSTY=",
+        "owner": "Hugo-L3174",
+        "repo": "mc_force_shoe_plugin",
+        "rev": "d3c6a5b9f84c67fd25f8c6ccc0396d5a9572d579",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Hugo-L3174",
+        "ref": "pull/16/head",
+        "repo": "mc_force_shoe_plugin",
+        "type": "github"
+      }
+    },
     "mc-rtc-nix": {
       "inputs": {
         "flake-parts": [
@@ -343,6 +394,23 @@
       "original": {
         "owner": "mc-rtc",
         "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "mc-state-observation": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1747225294,
+        "narHash": "sha256-zMfWJ40+qfmSDGmRAx25DdSfqfbZCbZAGz4uPoOTDTA=",
+        "owner": "arntanguy",
+        "repo": "mc_state_observation",
+        "rev": "1a56ad133d26cb0fa80c4359380fb5934ad7ce6e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "arntanguy",
+        "ref": "topic/DynamicConstraint",
+        "repo": "mc_state_observation",
         "type": "github"
       }
     },
@@ -542,11 +610,15 @@
     },
     "root": {
       "inputs": {
+        "dcm-vrptask": "dcm-vrptask",
         "flake-parts": [
           "mc-rtc-nix",
           "flake-parts"
         ],
+        "mc-dynamic-polytopes": "mc-dynamic-polytopes",
+        "mc-force-shoe-plugin": "mc-force-shoe-plugin",
         "mc-rtc-nix": "mc-rtc-nix",
+        "mc-state-observation": "mc-state-observation",
         "systems": [
           "mc-rtc-nix",
           "systems"
