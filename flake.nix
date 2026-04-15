@@ -21,22 +21,19 @@
             flakoboros = {
               extraPackages = [ "ninja" ];
               extraDevPackages = [ "pkg-config" ];
-              overrideAttrs.mc-panda = {
-                src = lib.cleanSource /home/arnaud/devel/mc-rtc-nix/workspace/mc_panda;
-                # cmakeFlags = drv-prev.cmakeFlags ++ [
-                #   "-DPYTHON_BINDINGS=OFF"
-                # ];
-              };
-              overrideAttrs.mc-panda-lirmm = {
-                src = lib.cleanSource /home/arnaud/devel/mc-rtc-nix/workspace/mc_panda_lirmm;
-              };
-              overrideAttrs.panda-prosthesis = {
-                src = lib.cleanSource ./.;
-              };
+              overrideAttrs.mc-force-shoe-plugin =
+                { pkgs-final, ... }:
+                {
+                  # src = lib.cleanSource /home/arnaud/devel/mc-rtc-nix/workspace/mc_force_shoe_plugin;
 
-              overrideAttrs.mc-force-shoe-plugin = {
-                src = lib.cleanSource /home/arnaud/devel/mc-rtc-nix/workspace/mc_force_shoe_plugin;
-              };
+                  # https://github.com/Hugo-L3174/mc_force_shoe_plugin/pull/16
+                  src = pkgs-final.fetchFromGitHub {
+                    owner = "arntanguy";
+                    repo = "mc_force_shoe_plugin";
+                    rev = "d3c6a5b9f84c67fd25f8c6ccc0396d5a9572d579";
+                    hash = "sha256-mFwizoWXQFV6uKIG7AcbPd40Mio4vvsrQGtngtaiSTY=";
+                  };
+                };
               overrideAttrs.mc-state-observation =
                 { pkgs-final, ... }:
                 {
