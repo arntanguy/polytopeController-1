@@ -3,16 +3,12 @@
 
   inputs = {
     mc-rtc-nix.url = "github:mc-rtc/nixpkgs";
-    # mc-rtc-nix.url = "path:/home/arnaud/devel/mc-rtc-nix/nixpkgs";
-    # mc-rtc-nix.url = "github:arntanguy/nixpkgs-1?ref=topic/flakoboros";
     flake-parts.follows = "mc-rtc-nix/flake-parts";
     systems.follows = "mc-rtc-nix/systems";
 
     # or use pull/N/merge to get the version merged with master, assuming there are no conflicts
-    mc-force-shoe-plugin.url = "github:Hugo-L3174/mc_force_shoe_plugin/pull/16/head";
-    mc-force-shoe-plugin.flake = false;
 
-    mc-state-observation.url = "github:arntanguy/mc_state_observation/topic/DynamicConstraint";
+    mc-state-observation.url = "github:jrl-umi3218/mc_state_observation/pull/57/head";
     mc-state-observation.flake = false;
 
     dcm-vrptask.url = "github:Hugo-L3174/DCM_VRPTask/pull/1/head";
@@ -21,14 +17,14 @@
     mc-dynamic-polytopes.url = "github:Hugo-L3174/mc_dynamic_polytopes/pull/6/head";
     mc-dynamic-polytopes.flake = false;
 
-    # FIXME: can't do that yet because of cmake submodule
+    mc-force-shoe-plugin.url = "github:Hugo-L3174/mc_force_shoe_plugin/pull/16/head";
 
+    # FIXME: can't do this because of benchmark submodule
     # tvm.url = "github:jrl-umi3218/tvm/pull/53/head";
     # tvm.flake = false;
 
-    # mc-rtc.url = "github:jrl-umi3218/mc_rtc/pull/507/head";
-    # # remove flake=false when https://github.com/jrl-umi3218/mc_rtc/pull/519 is merged
-    # mc-rtc.flake = false;
+    mc-rtc.url = "github:jrl-umi3218/mc_rtc/pull/507/head";
+    # mc-rtc.url = "path:/home/arnaud/devel/mc-rtc-nix/workspace/mc_rtc";
   };
 
   outputs =
@@ -52,24 +48,37 @@
               # To update to all inputs' latest commit, use
               # nix flake update
               overrideAttrs.mc-force-shoe-plugin = {
-                # src = lib.cleanSource /home/arnaud/devel/mc-rtc-nix/workspace/mc_force_shoe_plugin;
                 src = inputs.mc-force-shoe-plugin;
               };
 
               overrideAttrs.mc-state-observation =
-                { pkgs-final, ... }:
+                { ... }:
                 {
-                  src = pkgs-final.fetchgit {
-                    url = "https://github.com/arntanguy/mc_state_observation.git";
-                    rev = "1a56ad133d26cb0fa80c4359380fb5934ad7ce6e";
-                    hash = "sha256-sIY0mwNQkPDnqD7KssQ0OD851rQI3Q8kiPxVGB4+WAA=";
-                    fetchSubmodules = true;
-                  };
+                  src = inputs.mc-state-observation;
+                  # src = pkgs-final.fetchgit {
+                  #   url = "https://github.com/arntanguy/mc_state_observation.git";
+                  #   rev = "1a56ad133d26cb0fa80c4359380fb5934ad7ce6e";
+                  #   hash = "sha256-sIY0mwNQkPDnqD7KssQ0OD851rQI3Q8kiPxVGB4+WAA=";
+                  #   fetchSubmodules = true;
+                  # };
                 };
 
               overrideAttrs.dcm-vrptask = {
                 src = inputs.dcm-vrptask;
               };
+
+              overrideAttrs.politopix =
+                { ... }:
+                {
+                  src =
+                    builtins.trace "politopix is currently a private repository, ask I2S Bordeaux to make it public"
+                      (
+                        builtins.fetchGit {
+                          url = "git@github.com:Hugo-L3174/politopix";
+                          rev = "f625b42de4404eea16aabcf720f2cee19dfdc406";
+                        }
+                      );
+                };
 
               overrideAttrs.mc-dynamic-polytopes = {
                 src = inputs.mc-dynamic-polytopes;
@@ -81,20 +90,16 @@
                   src = pkgs-final.fetchgit {
                     # tvm pr 53
                     url = "https://github.com/Hugo-L3174/tvm.git";
-                    rev = "0c66fac37db38f2e5bc4f3df2b418f3ae50cea68";
-                    sha256 = "sha256-wLalEmtXO4Id8PFtVoJD9KzCU4QKeAv/xp5mCjDvpnA=";
+                    rev = "4e6640660317dd9e311fc707de689c4cf984ee50";
+                    sha256 = "sha256-Mzx7J3yp9pcoOf5VMkma1sNs8uCqjgnCsZZYlHBGLE4=";
                   };
                 };
 
               overrideAttrs.mc-rtc =
-                { pkgs-final, ... }:
+                { ... }:
                 {
                   pname = "mc-rtc-hugo";
-                  src = pkgs-final.fetchgit {
-                    url = "https://github.com/arntanguy/mc_rtc.git";
-                    rev = "206a46008d6ade6d8e400263a88b62301e75fc57";
-                    sha256 = "sha256-DRyjyBjr+CBkQjFt9y9DdtV7UBLzr3ImIjsk7e0uiM8=";
-                  };
+                  src = inputs.mc-rtc;
                 };
 
               overrides.mc-mujoco-robots =
@@ -129,7 +134,7 @@
         perSystem =
           { pkgs, ... }:
           {
-            devShells.polytopeController-superbuild =
+            devShells.default =
               (pkgs.callPackage "${inputs.mc-rtc-nix}/shell.nix" {
                 inherit (pkgs) mc-rtc-superbuild;
               }).overrideAttrs
