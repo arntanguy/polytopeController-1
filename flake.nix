@@ -27,6 +27,19 @@
     # mc-rtc.url = "path:/home/arnaud/devel/mc-rtc-nix/workspace/mc_rtc";
   };
 
+  nixConfig = {
+    extra-substituters = [
+      "https://mc-rtc-nix.cachix.org"
+      "https://gepetto.cachix.org"
+      "https://attic.iid.ciirc.cvut.cz/ros"
+    ];
+    extra-trusted-public-keys = [
+      "mc-rtc-nix.cachix.org-1:5M3sLvHXJCep4wc1tQl7QuFWL2eH2I0jkuvWtqJDYQs="
+      "gepetto.cachix.org-1:toswMl31VewC0jGkN6+gOelO2Yom0SOHzPwJMY2XiDY="
+      "ros:JR95vUYsShSqfA1VTYoFt1Nz6uXasm5QrcOsGry9f6Q="
+    ];
+  };
+
   outputs =
     inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } (
@@ -34,11 +47,48 @@
       {
         systems = import inputs.systems;
         imports = [
-          inputs.mc-rtc-nix.flakeModulePrivate
+          inputs.mc-rtc-nix.flakeModule
           {
-            flakoboros = {
-              extraPackages = [ "ninja" ];
+            mc-rtc-nix = {
+              overlays.private = true;
+            };
+            mc-rtc-superbuild =
+              { pkgs, ... }:
+              {
+                enable = true;
+                project.pname = "";
+                configurations = {
+                  polytopeController-minimal = {
+                    extends = [ "minimal" ];
+                    runtime = {
+                      robots = [ pkgs.mc-rhps1 ];
+                      plugins = [ pkgs.mc-force-shoe-plugin ];
+                      observers = [ pkgs.mc-state-observation ];
 
+                      apps = [
+                        pkgs.mc-rtc-magnum
+                      ];
+                      config = "lib/mc_controller/etc/mc_rtc.yaml";
+                    };
+                    devel = {
+                      config = "lib/mc_controller/etc/mc_rtc.yaml";
+                      controllers = [ pkgs.polytopeController ];
+                    };
+                  };
+                  polytopeController-full = {
+                    extends = [
+                      "default"
+                      "polytopeController-minimal"
+                    ];
+                    runtime = {
+                      apps = [
+                        pkgs.mc-udp
+                      ];
+                    };
+                  };
+                };
+              };
+            flakoboros = {
               overrideAttrs.polytopeController = {
                 src = lib.cleanSource ./.;
               };
@@ -110,44 +160,9 @@
                     rhps1-mj-description
                   ];
                 };
-
-              # overrides override package function arguments, while overrideAttrs overrides the attribute set
-              overrides.mc-rtc-superbuild =
-                { pkgs-final, pkgs-prev, ... }:
-                let
-                  cfg-prev = pkgs-prev.mc-rtc-superbuild.superbuildArgs;
-                in
-                {
-                  superbuildArgs = cfg-prev // {
-                    pname = "mc-rtc-superbuild-hugo";
-                    robots = [ pkgs-final.mc-rhps1 ];
-                    controllers = [ pkgs-final.polytopeController ];
-                    configs = [ "${pkgs-final.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml" ];
-                    plugins = [ pkgs-final.mc-force-shoe-plugin ];
-                    observers = [ pkgs-final.mc-state-observation ];
-                  };
-                };
-
             };
           }
         ];
-        perSystem =
-          { pkgs, ... }:
-          {
-            devShells.default =
-              (pkgs.callPackage "${inputs.mc-rtc-nix}/shell.nix" {
-                inherit (pkgs) mc-rtc-superbuild;
-              }).overrideAttrs
-                (old: {
-                  shellHook = ''
-                    ${old.shellHook or ""}
-
-                    # Your custom shellHook commands
-                    export POLYTOPE_CONTROLLER="${pkgs.polytopeController}/lib/mc_controller/etc/mc_rtc.yaml"
-                    export POLYTOPE_CONTROLLER_MUJOCO="${pkgs.polytopeController}/lib/mc_controller/etc/mc_rtc_MuJoCo.yaml"
-                  '';
-                });
-          };
       }
     );
 }
