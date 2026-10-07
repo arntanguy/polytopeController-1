@@ -25,6 +25,8 @@
 
     mc-rtc.url = "github:jrl-umi3218/mc_rtc/pull/507/head";
     # mc-rtc.url = "path:/home/arnaud/devel/mc-rtc-nix/workspace/mc_rtc";
+
+    ccache-trigger.url = "github:boolean-option/true";
   };
 
   nixConfig = {
@@ -51,6 +53,7 @@
           {
             mc-rtc-nix = {
               overlays.private = true;
+              overlays.ccache = inputs.ccache-trigger.value;
             };
             mc-rtc-superbuild =
               { pkgs, ... }:
@@ -102,9 +105,11 @@
               };
 
               overrideAttrs.mc-state-observation =
-                { ... }:
+                { drv-prev, pkgs-final, ... }:
                 {
                   src = inputs.mc-state-observation;
+                  nativeBuildInputs = (drv-prev.nativeBuildInputs or [ ]) ++ [ pkgs-final.jrl-cmakemodulesv2 ];
+                  dontWrapQtApps = true; # XXX: why?
                   # src = pkgs-final.fetchgit {
                   #   url = "https://github.com/arntanguy/mc_state_observation.git";
                   #   rev = "1a56ad133d26cb0fa80c4359380fb5934ad7ce6e";
@@ -115,6 +120,7 @@
 
               overrideAttrs.dcm-vrptask = {
                 src = inputs.dcm-vrptask;
+                dontWrapQtApps = true; # XXX: why?
               };
 
               overrideAttrs.politopix =
@@ -132,6 +138,7 @@
 
               overrideAttrs.mc-dynamic-polytopes = {
                 src = inputs.mc-dynamic-polytopes;
+                dontWrapQtApps = true; # XXX: why?
               };
 
               overrideAttrs.tvm =
