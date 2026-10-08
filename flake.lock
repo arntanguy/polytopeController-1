@@ -33,11 +33,11 @@
     "dcm-vrptask": {
       "flake": false,
       "locked": {
-        "lastModified": 1773699825,
-        "narHash": "sha256-eIwSAAjkPj+SjQOQ0okSCD+QmwL0DL8IGOZsrH1AK4Y=",
+        "lastModified": 1791490891,
+        "narHash": "sha256-lyJZDX2oeqo6TU0amcFQmIxAlWjKNgzbN14cPhkgzJk=",
         "owner": "Hugo-L3174",
         "repo": "DCM_VRPTask",
-        "rev": "5ceb14fbfebb82b704b4c8629b9a4d0e300f3153",
+        "rev": "3ed4a96194ca6c1fd046237aa3571155de599939",
         "type": "github"
       },
       "original": {
@@ -441,6 +441,23 @@
       "original": {
         "owner": "gepetto",
         "repo": "flakoboros",
+        "type": "github"
+      }
+    },
+    "g1-description": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791003132,
+        "narHash": "sha256-PkYuIIvIKDpgnLhiTO1gUxVsMATd5S6MIK9PB/JY5M4=",
+        "owner": "isri-aist",
+        "repo": "g1_description",
+        "rev": "df1f7c2aa2acd5c3d9d00469c991f3493c84f15b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "isri-aist",
+        "ref": "pull/2/head",
+        "repo": "g1_description",
         "type": "github"
       }
     },
@@ -1053,6 +1070,22 @@
         "type": "github"
       }
     },
+    "mc-external-forces-observer": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790680746,
+        "narHash": "sha256-WnPYPadH+gOLYN5udrECvskCEk/WGIqipy1BqVPVFPA=",
+        "owner": "y-hadj",
+        "repo": "mc_external_forces_observer",
+        "rev": "655f2f99b3c24f374a6f573415eb90187cf0347f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "y-hadj",
+        "repo": "mc_external_forces_observer",
+        "type": "github"
+      }
+    },
     "mc-force-shoe-plugin": {
       "inputs": {
         "flake-parts": [
@@ -1079,6 +1112,22 @@
         "owner": "Hugo-L3174",
         "ref": "pull/16/head",
         "repo": "mc_force_shoe_plugin",
+        "type": "github"
+      }
+    },
+    "mc-g1": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790677625,
+        "narHash": "sha256-6bxir2/46XGAPFNag0Hs2JuOTZc5dN4GLyh8sbN5GO8=",
+        "owner": "y-hadj",
+        "repo": "mc_g1",
+        "rev": "0ef7ee201652d5588f18b409b6af9d346f146211",
+        "type": "github"
+      },
+      "original": {
+        "owner": "y-hadj",
+        "repo": "mc_g1",
         "type": "github"
       }
     },
@@ -1785,6 +1834,19 @@
         "type": "github"
       }
     },
+    "revo2-description": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791490137,
+        "narHash": "sha256-bl7psRW+6ZBj3JU8iIlwPHCTWdeySWjJEDx2JAVRzXU=",
+        "path": "/home/arnaud/devel/isri-aist/revo2_description",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/arnaud/devel/isri-aist/revo2_description",
+        "type": "path"
+      }
+    },
     "root": {
       "inputs": {
         "ccache-trigger": "ccache-trigger",
@@ -1793,11 +1855,15 @@
           "mc-rtc-nix",
           "flake-parts"
         ],
+        "g1-description": "g1-description",
         "mc-dynamic-polytopes": "mc-dynamic-polytopes",
+        "mc-external-forces-observer": "mc-external-forces-observer",
         "mc-force-shoe-plugin": "mc-force-shoe-plugin",
+        "mc-g1": "mc-g1",
         "mc-rtc": "mc-rtc",
         "mc-rtc-nix": "mc-rtc-nix_3",
         "mc-state-observation": "mc-state-observation",
+        "revo2-description": "revo2-description",
         "systems": [
           "mc-rtc-nix",
           "systems"

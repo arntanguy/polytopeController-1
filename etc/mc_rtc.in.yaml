@@ -3,6 +3,6 @@
 
 MainRobot:
   module: "@MAINROBOT_NAME@"
-  name: rhps1
+  name: "@CONTROLLER_ROBOT_NAME@"
 Timestep: 0.002
 Enabled: PolytopeController

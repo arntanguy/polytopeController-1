@@ -27,6 +27,20 @@
     # mc-rtc.url = "path:/home/arnaud/devel/mc-rtc-nix/workspace/mc_rtc";
 
     ccache-trigger.url = "github:boolean-option/true";
+
+    g1-description.url = "github:isri-aist/g1_description/pull/2/head";
+    g1-description.flake = false;
+
+    revo2-description.url = "path:/home/arnaud/devel/isri-aist/revo2_description";
+    revo2-description.flake = false;
+
+
+    # mc-g1.url = "github:isri-aist/mc_g1/pull/2/head";
+    mc-g1.url = "github:y-hadj/mc_g1";
+    mc-g1.flake = false;
+
+    mc-external-forces-observer.url = "github:y-hadj/mc_external_forces_observer";
+    mc-external-forces-observer.flake = false;
   };
 
   nixConfig = {
@@ -61,27 +75,54 @@
                 enable = true;
                 project.pname = "";
                 configurations = {
-                  polytopeController-minimal = {
+                  polytopeController-rhps1-minimal = {
                     extends = [ "minimal" ];
                     runtime = {
-                      robots = [ pkgs.mc-rhps1 ];
+                      robots = [
+                        pkgs.mc-rhps1
+                      ];
                       plugins = [ pkgs.mc-force-shoe-plugin ];
-                      observers = [ pkgs.mc-state-observation ];
+                      observers = [
+                        pkgs.mc-state-observation
+                      ];
 
                       apps = [
                         pkgs.mc-rtc-magnum
                       ];
-                      config = "lib/mc_controller/etc/mc_rtc.yaml";
+                      config = "lib/mc_controller/etc/mc_rtc_rhps1.yaml";
                     };
                     devel = {
-                      config = "lib/mc_controller/etc/mc_rtc.yaml";
+                      config = "lib64/mc_controller/etc/mc_rtc_rhps1.yaml";
                       controllers = [ pkgs.polytopeController ];
                     };
                   };
-                  polytopeController-full = {
+                  polytopeController-g1-minimal = {
+                    extends = [ "minimal" ];
+                    runtime = {
+                      robots = [
+                        pkgs.mc-g1
+                        pkgs.mc-revo2
+                      ];
+                      plugins = [ pkgs.mc-force-shoe-plugin ];
+                      observers = [
+                        pkgs.mc-state-observation
+                        pkgs.mc-external-forces-observer
+                      ];
+
+                      apps = [
+                        pkgs.mc-rtc-magnum
+                      ];
+                      config = "lib/mc_controller/etc/mc_rtc_g1.yaml";
+                    };
+                    devel = {
+                      config = "lib64/mc_controller/etc/mc_rtc_g1.yaml";
+                      controllers = [ pkgs.polytopeController ];
+                    };
+                  };
+                  polytopeController-rhps1-full = {
                     extends = [
                       "default"
-                      "polytopeController-minimal"
+                      "polytopeController-rhps1-minimal"
                     ];
                     runtime = {
                       apps = [
@@ -89,9 +130,151 @@
                       ];
                     };
                   };
+                  polytopeController-g1-full = {
+                    extends = [
+                      "default"
+                      "polytopeController-g1-minimal"
+                    ];
+                    runtime = {
+                      apps = [
+                        pkgs.mc-rtc-rviz
+                      ];
+                    };
+                  };
                 };
               };
             flakoboros = {
+              packages = {
+                mc-external-forces-observer =
+                  {
+                    stdenv,
+                    lib,
+                    cmake,
+                    mc-rtc,
+                  }:
+
+                  stdenv.mkDerivation {
+                    pname = "mc-external-forces-observer-yhadj";
+                    version = "0.0.0";
+
+                    # main
+                    src = inputs.mc-external-forces-observer;
+                    nativeBuildInputs = [
+                      cmake
+                    ];
+                    propagatedBuildInputs = [
+                      mc-rtc
+                    ];
+
+                    cmakeFlags = [ ];
+                    doCheck = true;
+
+                    meta = with lib; {
+                      mainProgram = "mc-external-forces-observer";
+                      description = "State observer for external forces based on torque measurements";
+                      homepage = "https://github.com/isri-aist/mc_external_forces_observer";
+                      license = licenses.bsd2;
+                      platforms = platforms.all;
+                    };
+                  };
+            mc-revo2 =
+              {
+                stdenv,
+                lib,
+                fetchFromGitHub,
+                cmake,
+                mc-rtc,
+                revo2-description,
+              }:
+
+              let
+
+                revo2-description' = revo2-description.override {
+                  with-ros = mc-rtc.with-ros;
+                };
+
+              in
+
+              stdenv.mkDerivation {
+                pname = "mc-revo2";
+                version = "1.0.0";
+
+                src = fetchFromGitHub {
+                  owner = "isri-aist";
+                  repo = "mc_revo2";
+                  rev = "d654763f64f329d42707221f24981111fa2abb01";
+                  hash = "sha256-T3ccoyWOhNzEtchV2fLAzNRQMgx/M85laFq5DaOVNfc=";
+                };
+                nativeBuildInputs = [ cmake ];
+                propagatedBuildInputs = [
+                  revo2-description'
+                  mc-rtc
+                ];
+
+                cmakeFlags = [
+                  "-DBUILD_TESTING=OFF"
+                ];
+
+                passthru = {
+                  # TODO
+                  # mujocoRobots = [ "revo2-mj-description" ];
+                };
+
+                doCheck = false;
+
+                meta = with lib; {
+                  description = "revo2 RobotModule for mc-rtc";
+                  homepage = "https://github.com/isri-aist/mc_revo2";
+                  license = licenses.bsd2;
+                  platforms = platforms.all;
+                };
+              };
+
+            revo2-description =
+              {
+                stdenv,
+                lib,
+                fetchFromGitHub,
+                cmake,
+                with-ros ? false,
+                ament-cmake,
+                buildRosPackage,
+              }:
+
+              (if with-ros then buildRosPackage else stdenv.mkDerivation) {
+                pname = "revo2-description";
+                version = "1.0.0";
+                separateDebugInfo = false;
+
+                src = fetchFromGitHub {
+                  owner = "isri-aist";
+                  repo = "revo2_description";
+                  rev = "7b8d7cea3f886f93ae98344766988ac0720125b9";
+                  hash = "sha256-Ui6E6gzYdAutNS6tn+T8UkspkmyTqfFNpzL1s3fVIXA=";
+                };
+
+                buildType = "ament_cmake";
+                nativeBuildInputs = if with-ros then [ ament-cmake ] else [ cmake ];
+                propagatedBuildInputs = [ ];
+
+                preConfigure = ''
+                  export ROS_VERSION=2
+                '';
+
+                cmakeFlags = lib.optional (!with-ros) "-DDISABLE_ROS=ON" ++ [
+                  "-DBUILD_TESTING=OFF"
+                ];
+
+                doCheck = false;
+
+                meta = with lib; {
+                  description = "revo2 urdf and data";
+                  homepage = "https://github.com/isri-aist/revo2_description";
+                  license = licenses.bsd2;
+                  platforms = platforms.all;
+                };
+              };
+              };
               overrideAttrs.polytopeController = {
                 src = lib.cleanSource ./.;
               };
@@ -167,6 +350,16 @@
                     rhps1-mj-description
                   ];
                 };
+
+              overrideAttrs.mc-g1 = {
+                src = inputs.mc-g1;
+              };
+              overrideAttrs.g1-description = {
+                src = inputs.g1-description;
+              };
+              overrideAttrs.revo2-description = {
+                src = inputs.revo2-description;
+              };
             };
           }
         ];
