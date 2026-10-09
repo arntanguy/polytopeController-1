@@ -17,7 +17,10 @@
     mc-dynamic-polytopes.url = "github:Hugo-L3174/mc_dynamic_polytopes/pull/6/head";
     mc-dynamic-polytopes.flake = false;
 
-    mc-force-shoe-plugin.url = "github:Hugo-L3174/mc_force_shoe_plugin/pull/16/head";
+    # mc-force-shoe-plugin.url = "github:Hugo-L3174/mc_force_shoe_plugin/pull/16/head";
+    # mc-force-shoe-plugin.url = "path:/home/arnaud/devel/mc-rtc-nix/workspace/mc_force_shoe_plugin";
+    mc-force-shoe-plugin.url = "github:Hugo-L3174/mc_force_shoe_plugin/pull/22/head";
+    mc-force-shoe-plugin.flake = false;
 
     # FIXME: can't do this because of benchmark submodule
     # tvm.url = "github:jrl-umi3218/tvm/pull/53/head";
@@ -100,7 +103,7 @@
               # They are locked in flake.lock to the latest commit available at the time
               # To update to all inputs' latest commit, use
               # nix flake update
-              overrideAttrs.mc-force-shoe-plugin = {
+              overrideAttrs.mc-force-shoe-plugin = { ... }: {
                 src = inputs.mc-force-shoe-plugin;
               };
 
