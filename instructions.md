@@ -48,7 +48,7 @@ Dans la fenêtre qui s'ouvre:
 - Connect MC Control (UDP)
 - Start MC Control (UDP)
 
-Le robot est prêt à recevoir des commandes de `mc_rtc` par `UDP`. 
+Le robot est prêt à recevoir des commandes de `mc_rtc` par `UDP`.
 
 - Le poser par terre pied gauche sur la marque.
 - S'assurer que le Xsens MVN pour les capteurs de force est allumé (dans la coque arrière droite du robot). Le brancher, puis appuyer sur le bouton, lumière bleue quand la communication est établie avec le PC.
@@ -71,7 +71,7 @@ direnv: using flake .#polytopeController-full
 direnv: nix-direnv: Using cached dev shell
 
 =============================================
-  polytopeController-full interactive shell  
+  polytopeController-full interactive shell
 =============================================
 This shell was built from the 'polytopeController-full' mc-rtc-superbuild configuration.
 
